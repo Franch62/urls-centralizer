@@ -1,8 +1,10 @@
 services:
   - type: web
     name: urls-centralizer
-    env: go
-    plan: free
-    buildCommand: go build -o main .
+    runtime: go
+    buildCommand: go build -o main ./cmd
     startCommand: ./main
+    envVars:
+      - key: PORT
+        value: 10000
     autoDeploy: true
