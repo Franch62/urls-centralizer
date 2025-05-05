@@ -3,8 +3,9 @@ package controllers
 import (
 	"io"
 	"net/http"
-	"urls-centralizer/config"
-	"urls-centralizer/models"
+
+	"github.com/Franch62/urls-centralizer/config"
+	"github.com/Franch62/urls-centralizer/models"
 
 	"github.com/gin-gonic/gin"
 	"gopkg.in/yaml.v2"

@@ -1,10 +1,12 @@
 package main
 
 import (
+	"net/http"
 	"os"
-	"urls-centralizer/config"
-	"urls-centralizer/models"
-	"urls-centralizer/routes"
+
+	"github.com/Franch62/urls-centralizer/config"
+	"github.com/Franch62/urls-centralizer/models"
+	"github.com/Franch62/urls-centralizer/routes"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,7 +20,8 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "8080" // fallback local
 	}
-	router.Run(":" + port)
+
+	http.ListenAndServe(":"+port, router)
 }

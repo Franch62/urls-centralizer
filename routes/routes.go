@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"urls-centralizer/controllers"
+	"github.com/Franch62/urls-centralizer/controllers"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
