@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"urls-centralizer/config"
 	"urls-centralizer/models"
 	"urls-centralizer/routes"
@@ -13,7 +14,11 @@ func main() {
 	config.DB.AutoMigrate(&models.URL{})
 
 	router := gin.Default()
+	routes.SetupRoutes(router)
 
-	r := routes.SetupRoutes(router)
-	r.Run(":8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	router.Run(":" + port)
 }

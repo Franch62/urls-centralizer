@@ -2,8 +2,9 @@ services:
   - type: web
     name: urls-centralizer
     env: go
-    buildCommand: go build -o main ./cmd
+    buildCommand: cd cmd && go build -o main
     startCommand: ./main
     envVars:
       - key: PORT
         value: 10000
+    autoDeploy: true
