@@ -7,6 +7,7 @@ import (
 	"urls-centralizer/models"
 
 	"github.com/gin-gonic/gin"
+	"gopkg.in/yaml.v2"
 )
 
 func CreateURL(c *gin.Context) {
@@ -135,4 +136,47 @@ func ProxyYAML(c *gin.Context) {
 	c.Header("Content-Type", "text/yaml")
 	c.Status(http.StatusOK)
 	io.Copy(c.Writer, resp.Body)
+}
+
+func GetURLEndpoints(c *gin.Context) {
+	id := c.Param("id")
+
+	// Busca a URL no banco
+	var url models.URL
+	if err := config.DB.First(&url, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "URL não encontrada"})
+		return
+	}
+
+	// Busca o YAML remoto
+	resp, err := http.Get(url.URL)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		c.JSON(http.StatusBadGateway, gin.H{"error": "Erro ao acessar a URL remota"})
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao ler o conteúdo da resposta"})
+		return
+	}
+
+	// Estrutura para decodificar apenas a parte de "paths"
+	var parsed struct {
+		Paths map[string]interface{} `yaml:"paths"`
+	}
+
+	if err := yaml.Unmarshal(body, &parsed); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao parsear o YAML"})
+		return
+	}
+
+	// Extrai os caminhos (endpoints)
+	endpoints := make([]string, 0, len(parsed.Paths))
+	for path := range parsed.Paths {
+		endpoints = append(endpoints, path)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"endpoints": endpoints})
 }
